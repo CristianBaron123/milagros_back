@@ -1,7 +1,7 @@
 const router = require('express').Router();
-const { authenticate } = require('../middleware/auth');
-const { getInsights } = require('../controllers/ai.controller');
 
-router.get('/insights', authenticate, getInsights);
+router.get('/insights', (req, res) => {
+  res.status(503).json({ error: 'IA no disponible aún — configura ANTHROPIC_API_KEY' });
+});
 
 module.exports = router;
