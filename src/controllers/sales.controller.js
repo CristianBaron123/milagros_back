@@ -3,6 +3,14 @@ const prisma = require('../lib/prisma');
 async function create(req, res) {
   const { customerId, type, method, notes, items, creditRef } = req.body;
 
+  // Resolve anonymous customer
+  let resolvedCustomerId = customerId ? Number(customerId) : null;
+  if (!resolvedCustomerId) {
+    let anon = await prisma.customer.findFirst({ where: { name: 'Clienta anónima' } });
+    if (!anon) anon = await prisma.customer.create({ data: { name: 'Clienta anónima' } });
+    resolvedCustomerId = anon.id;
+  }
+
   const products = await prisma.product.findMany({
     where: { id: { in: items.map(i => Number(i.productId)) } },
   });
@@ -14,13 +22,13 @@ async function create(req, res) {
     return { productId: p.id, quantity: qty, unitPrice, costPrice: p.costPrice, subtotal: unitPrice * qty };
   });
 
-  const total = saleItems.reduce((s, i) => s + i.subtotal, 0);
+  const total  = saleItems.reduce((s, i) => s + i.subtotal, 0);
   const profit = saleItems.reduce((s, i) => s + (i.subtotal - i.costPrice * i.quantity), 0);
 
   const sale = await prisma.$transaction(async (tx) => {
     const s = await tx.sale.create({
       data: {
-        customerId: Number(customerId),
+        customerId: resolvedCustomerId,
         type: type || 'DETAL',
         method: method || 'EFECTIVO',
         total,
@@ -43,12 +51,8 @@ async function create(req, res) {
     }
 
     await tx.customer.update({
-      where: { id: Number(customerId) },
-      data: {
-        lastPurchaseAt: new Date(),
-        visitCount: { increment: 1 },
-        totalLifetime: { increment: total },
-      },
+      where: { id: resolvedCustomerId },
+      data: { lastPurchaseAt: new Date(), visitCount: { increment: 1 }, totalLifetime: { increment: total } },
     });
 
     if ((method === 'ADDI' || method === 'SISTECREDITO') && creditRef) {
