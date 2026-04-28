@@ -113,25 +113,25 @@ async function main() {
 
   // Expenses
   await Promise.all([
-    prisma.expense.create({ data: { description: 'Transporte zona Laureles',  amount: 15000,  category: 'Transporte', date: daysAgo(0),  sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Bolsas y empaque',          amount: 8000,   category: 'Materiales', date: daysAgo(1),  sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Transporte zona Envigado',  amount: 18000,  category: 'Transporte', date: daysAgo(2),  sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Recarga celular',           amount: 20000,  category: 'Comunicación', date: daysAgo(3), sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Transporte zona Belén',     amount: 12000,  category: 'Transporte', date: daysAgo(5),  sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Catálogos impresos',        amount: 35000,  category: 'Materiales', date: daysAgo(7),  sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Transporte zona Poblado',   amount: 22000,  category: 'Transporte', date: daysAgo(10), sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Bolsas regalo',             amount: 14000,  category: 'Materiales', date: daysAgo(14), sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Transporte zona Itagüí',    amount: 16000,  category: 'Transporte', date: daysAgo(18), sellerId: seller.id } }),
-    prisma.expense.create({ data: { description: 'Internet y datos',          amount: 45000,  category: 'Comunicación', date: daysAgo(20), sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Transporte zona Laureles',  amount: 15000,  category: 'Transporte',   date: daysAgo(0),  sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Bolsas y empaque',          amount: 8000,   category: 'Materiales',   date: daysAgo(1),  sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Transporte zona Envigado',  amount: 18000,  category: 'Transporte',   date: daysAgo(2),  sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Recarga celular',           amount: 20000,  category: 'Comunicacion', date: daysAgo(3),  sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Transporte zona Belén',     amount: 12000,  category: 'Transporte',   date: daysAgo(5),  sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Catálogos impresos',        amount: 35000,  category: 'Materiales',   date: daysAgo(7),  sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Transporte zona Poblado',   amount: 22000,  category: 'Transporte',   date: daysAgo(10), sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Bolsas regalo',             amount: 14000,  category: 'Materiales',   date: daysAgo(14), sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Transporte zona Itagüí',    amount: 16000,  category: 'Transporte',   date: daysAgo(18), sellerId: seller.id } }),
+    prisma.expense.create({ data: { label: 'Internet y datos',          amount: 45000,  category: 'Comunicacion', date: daysAgo(20), sellerId: seller.id } }),
   ]);
 
   // Goals
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
   const monthEnd   = new Date(monthStart.getFullYear(), monthStart.getMonth()+1, 0);
   await Promise.all([
-    prisma.goal.create({ data: { name: 'Ventas del mes',       type: 'VENTAS',   targetAmount: 3000000, currentAmount: 1850000, period: 'MENSUAL', startDate: monthStart, endDate: monthEnd } }),
-    prisma.goal.create({ data: { name: 'Nuevas clientas',      type: 'CLIENTES', targetAmount: 5,       currentAmount: 2,       period: 'MENSUAL', startDate: monthStart, endDate: monthEnd } }),
-    prisma.goal.create({ data: { name: 'Meta semanal ventas',  type: 'VENTAS',   targetAmount: 800000,  currentAmount: 620000,  period: 'SEMANAL', startDate: daysAgo(6), endDate: daysAgo(0) } }),
+    prisma.goal.create({ data: { type: 'MONTHLY',    targetAmount: 3000000, startDate: monthStart, endDate: monthEnd,   userId: seller.id } }),
+    prisma.goal.create({ data: { type: 'MAYORISTA',  targetAmount: 1500000, startDate: monthStart, endDate: monthEnd,   userId: seller.id } }),
+    prisma.goal.create({ data: { type: 'WEEKLY',     targetAmount: 800000,  startDate: daysAgo(6), endDate: daysAgo(0), userId: seller.id } }),
   ]);
 
   // Message templates
