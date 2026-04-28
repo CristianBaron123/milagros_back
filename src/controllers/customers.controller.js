@@ -15,7 +15,8 @@ async function getAll(req, res) {
 
   if (readyToBuy === 'true') {
     const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 7);
+    const days = Number(req.query.days) || 7;
+    cutoff.setDate(cutoff.getDate() - days);
     customers = customers.filter(c => c.lastPurchaseAt && c.lastPurchaseAt < cutoff);
   }
 

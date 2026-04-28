@@ -24,4 +24,17 @@ async function getZoneAnalytics(req, res) {
   res.json(analytics);
 }
 
-module.exports = { getAll, create, getZoneAnalytics };
+async function update(req, res) {
+  const zone = await prisma.zone.update({
+    where: { id: Number(req.params.id) },
+    data: { name: req.body.name },
+  });
+  res.json(zone);
+}
+
+async function remove(req, res) {
+  await prisma.zone.delete({ where: { id: Number(req.params.id) } });
+  res.json({ ok: true });
+}
+
+module.exports = { getAll, create, getZoneAnalytics, update, remove };
