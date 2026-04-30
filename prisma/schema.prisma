@@ -13,6 +13,8 @@ model User {
   email     String   @unique
   password  String
   role      Role     @default(SELLER)
+  zoneId    Int?
+  zone      Zone?    @relation(fields: [zoneId], references: [id])
   createdAt DateTime @default(now())
 
   sales    Sale[]
@@ -73,6 +75,7 @@ model Zone {
   id        Int        @id @default(autoincrement())
   name      String     @unique
   customers Customer[]
+  sellers   User[]
 }
 
 model Customer {

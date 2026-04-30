@@ -1,16 +1,25 @@
 const prisma = require('../lib/prisma');
 
 async function getAll(req, res) {
+  const where = {};
+  if (req.query.userId) {
+    where.userId = Number(req.query.userId);
+  } else if (req.user.role !== 'ADMIN') {
+    where.userId = req.user.id;
+  }
+
   const goals = await prisma.goal.findMany({
-    where: { userId: req.user.id },
+    where,
     orderBy: { startDate: 'desc' },
+    include: { user: { select: { id: true, name: true } } },
   });
 
   const now = new Date();
   const goalsWithProgress = await Promise.all(goals.map(async (g) => {
+    const sellerId = g.userId;
     const sales = await prisma.sale.aggregate({
       _sum: { total: true },
-      where: { sellerId: req.user.id, date: { gte: g.startDate, lte: g.endDate } },
+      where: { sellerId, date: { gte: g.startDate, lte: g.endDate } },
     });
     const current = sales._sum.total || 0;
     const pct = Math.round((current / g.targetAmount) * 100);
@@ -22,9 +31,11 @@ async function getAll(req, res) {
 }
 
 async function create(req, res) {
-  const { type, targetAmount, startDate, endDate } = req.body;
+  const { type, targetAmount, startDate, endDate, userId } = req.body;
+  const assignTo = (req.user.role === 'ADMIN' && userId) ? Number(userId) : req.user.id;
   const goal = await prisma.goal.create({
-    data: { type, targetAmount: Number(targetAmount), startDate: new Date(startDate), endDate: new Date(endDate), userId: req.user.id },
+    data: { type, targetAmount: Number(targetAmount), startDate: new Date(startDate), endDate: new Date(endDate), userId: assignTo },
+    include: { user: { select: { id: true, name: true } } },
   });
   res.status(201).json(goal);
 }

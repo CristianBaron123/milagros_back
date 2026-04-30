@@ -2,7 +2,7 @@ const prisma = require('../lib/prisma');
 
 async function getAll(req, res) {
   const zones = await prisma.zone.findMany({
-    include: { _count: { select: { customers: true } } },
+    include: { _count: { select: { customers: true, sellers: true } }, sellers: { select: { id: true, name: true } } },
     orderBy: { name: 'asc' },
   });
   res.json(zones);

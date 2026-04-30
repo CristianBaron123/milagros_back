@@ -24,4 +24,13 @@ async function remove(req, res) {
   res.json({ ok: true });
 }
 
-module.exports = { getAll, create, remove };
+async function update(req, res) {
+  const { label, amount, category } = req.body;
+  const expense = await prisma.expense.update({
+    where: { id: Number(req.params.id) },
+    data: { label, amount: Number(amount), category },
+  });
+  res.json(expense);
+}
+
+module.exports = { getAll, create, update, remove };

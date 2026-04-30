@@ -14,7 +14,7 @@ async function register(req, res) {
   const user = await prisma.user.create({ data: { name, email, password: hash } });
 
   const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
-  res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, zoneId: user.zoneId } });
 }
 
 async function login(req, res) {
@@ -29,15 +29,23 @@ async function login(req, res) {
   if (!valid) return res.status(401).json({ error: 'Credenciales incorrectas' });
 
   const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, zoneId: user.zoneId } });
 }
 
 async function me(req, res) {
   const user = await prisma.user.findUnique({
     where: { id: req.user.id },
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    select: { id: true, name: true, email: true, role: true, zoneId: true, createdAt: true },
   });
   res.json(user);
 }
 
-module.exports = { register, login, me };
+async function listSellers(req, res) {
+  const users = await prisma.user.findMany({
+    select: { id: true, name: true, email: true, role: true, zoneId: true, zone: { select: { id: true, name: true } } },
+    orderBy: { name: 'asc' },
+  });
+  res.json(users);
+}
+
+module.exports = { register, login, me, listSellers };
